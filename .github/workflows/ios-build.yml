@@ -50,7 +50,7 @@ jobs:
             CODE_SIGNING_ALLOWED=NO
 
       - name: Upload .ipa artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: TaskTimers-IPA
           path: build/output
