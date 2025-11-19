@@ -1,4 +1,4 @@
-name: iOS Build (TaskTimers)
+name: iOS Build
 
 on:
   push:
