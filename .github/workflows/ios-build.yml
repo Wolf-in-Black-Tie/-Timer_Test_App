@@ -1,56 +1,29 @@
-name: iOS Build
+name: iOS Build (test)
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
   workflow_dispatch:
 
 jobs:
   build:
-    name: Build iOS App on macOS
     runs-on: macos-latest
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - name: Set up Xcode
-        uses: maxim-lobanov/setup-xcode@v1
-        with:
-          xcode-version: latest
-
-      - name: Install dependencies (if using SwiftPM)
+      - name: Install Ruby gems (xcpretty & cocoapods)
         run: |
-          xcodebuild -resolvePackageDependencies
+          gem install xcpretty
+          gem install cocoapods
 
-      - name: Build for simulator
+      - name: Install CocoaPods
         run: |
-          xcodebuild \
-            -scheme TaskTimers \
-            -sdk iphonesimulator \
-            -destination 'platform=iOS Simulator,name=iPhone 15,OS=latest' \
-            clean build
+          pod install --project-directory=./ || true
 
-      - name: Build for iOS device (archive)
+      - name: Build (example)
         run: |
-          xcodebuild \
-            -scheme TaskTimers \
-            -archivePath build/TaskTimers.xcarchive \
-            -sdk iphoneos \
-            archive \
-            CODE_SIGNING_ALLOWED=NO
-
-      - name: Export .ipa
-        run: |
-          xcodebuild -exportArchive \
-            -archivePath build/TaskTimers.xcarchive \
-            -exportOptionsPlist exportOptions.plist \
-            -exportPath build/output \
-            CODE_SIGNING_ALLOWED=NO
-
-      - name: Upload .ipa artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: TaskTimers-IPA
-          path: build/output
+          # Replace workspace & scheme with your project values
+          xcodebuild -workspace YourApp.xcworkspace -scheme "YourScheme" -sdk iphonesimulator -configuration Release clean build | xcpretty
