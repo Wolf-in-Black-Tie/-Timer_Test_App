@@ -39,14 +39,13 @@ workflows:
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_IDENTITY="" \
             clean archive
-      - name: Export unsigned .ipa
+            - name: Export unsigned .ipa
         script: |
           xcodebuild -exportArchive \
             -archivePath build/TaskTimers.xcarchive \
-            -exportOptionsPlist "$EXPORT_OPTIONS_PLIST" \
+            -exportOptionsPlist exportOptions.plist \
             -exportPath build/output \
-            CODE_SIGNING_ALLOWED=NO \
-            CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGN_IDENTITY=""
+            CODE_SIGNING_ALLOWED=NO
+
     artifacts:
       - build/output/**
