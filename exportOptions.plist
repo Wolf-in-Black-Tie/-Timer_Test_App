@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <!-- Export method -->
+    <key>method</key>
+    <string>ad-hoc</string>
+
+    <!-- Do not include bitcode -->
+    <key>compileBitcode</key>
+    <false/>
+
+    <!-- No automatic signing -->
+    <key>signingStyle</key>
+    <string>manual</string>
+
+    <!-- Output location is handled by Codemagic -->
+    <key>destination</key>
+    <string>export</string>
+
+    <!-- Allow unsigned export -->
+    <key>stripSwiftSymbols</key>
+    <true/>
+
+    <key>manageAppVersionAndBuildNumber</key>
+    <false/>
+</dict>
+</plist>
