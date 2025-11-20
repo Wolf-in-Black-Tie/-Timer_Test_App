@@ -3,7 +3,7 @@ workflows:
     name: iOS Build (TaskTimers)
     max_build_duration: 60
     environment:
-      xcode: 15.3
+      xcode: 16.3
       vars:
         XCODE_PROJECT: "TaskTimers.xcodeproj"
         XCODE_SCHEME: "TaskTimers"
