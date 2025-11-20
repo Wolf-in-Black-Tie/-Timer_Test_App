@@ -2,25 +2,21 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-    <!-- Export method -->
+    <!-- Required for unsigned builds -->
     <key>method</key>
-    <string>ad-hoc</string>
+    <string>release-testing</string>
 
-    <!-- Do not include bitcode -->
-    <key>compileBitcode</key>
-    <false/>
-
-    <!-- No automatic signing -->
     <key>signingStyle</key>
     <string>manual</string>
 
-    <!-- Output location is handled by Codemagic -->
     <key>destination</key>
     <string>export</string>
 
-    <!-- Allow unsigned export -->
     <key>stripSwiftSymbols</key>
     <true/>
+
+    <key>compileBitcode</key>
+    <false/>
 
     <key>manageAppVersionAndBuildNumber</key>
     <false/>
