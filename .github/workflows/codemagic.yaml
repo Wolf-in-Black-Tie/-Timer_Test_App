@@ -1,0 +1,52 @@
+workflows:
+  ios_build:
+    name: iOS Build (TaskTimers)
+    max_build_duration: 60
+    environment:
+      xcode: 15.3
+      vars:
+        XCODE_PROJECT: "TaskTimers.xcodeproj"
+        XCODE_SCHEME: "TaskTimers"
+        EXPORT_OPTIONS_PLIST: "exportOptions.plist"
+    scripts:
+      - name: Resolve Swift Package dependencies
+        script: |
+          xcodebuild \
+            -project "$XCODE_PROJECT" \
+            -scheme "$XCODE_SCHEME" \
+            -resolvePackageDependencies
+      - name: Build for iOS Simulator (no code signing)
+        script: |
+          xcodebuild \
+            -project "$XCODE_PROJECT" \
+            -scheme "$XCODE_SCHEME" \
+            -sdk iphonesimulator \
+            -destination 'platform=iOS Simulator,name=iPhone 16 Pro,OS=17.5' \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            clean build
+      - name: Archive for device (no code signing)
+        script: |
+          mkdir -p build
+          xcodebuild \
+            -project "$XCODE_PROJECT" \
+            -scheme "$XCODE_SCHEME" \
+            -configuration Release \
+            -destination 'generic/platform=iOS' \
+            -archivePath build/TaskTimers.xcarchive \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            clean archive
+      - name: Export unsigned .ipa
+        script: |
+          xcodebuild -exportArchive \
+            -archivePath build/TaskTimers.xcarchive \
+            -exportOptionsPlist "$EXPORT_OPTIONS_PLIST" \
+            -exportPath build/output \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY=""
+    artifacts:
+      - build/output/**
