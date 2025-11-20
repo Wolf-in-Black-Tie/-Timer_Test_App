@@ -10,9 +10,12 @@ workflows:
         XCODE_SCHEME: "TaskTimers"
 
     scripts:
-      - name: Resolve SPM dependencies
+      - name: Resolve Swift Package dependencies
         script: |
-          xcodebuild -project "$XCODE_PROJECT" -scheme "$XCODE_SCHEME" -resolvePackageDependencies
+          xcodebuild \
+            -project "$XCODE_PROJECT" \
+            -scheme "$XCODE_SCHEME" \
+            -resolvePackageDependencies
 
       - name: Build for iOS Simulator
         script: |
@@ -38,13 +41,12 @@ workflows:
             CODE_SIGN_IDENTITY="" \
             archive
 
-      - name: Export unsigned .ipa
+      - name: Create unsigned .ipa
         script: |
-          xcodebuild -exportArchive \
-            -archivePath build/TaskTimers.xcarchive \
-            -exportPath build/output \
-            -exportOptionsPlist exportOptions.plist \
-            CODE_SIGNING_ALLOWED=NO
+          mkdir -p build/output/Payload
+          cp -R build/TaskTimers.xcarchive/Products/Applications/*.app build/output/Payload/
+          cd build/output
+          zip -r TaskTimers-unsigned.ipa Payload
 
     artifacts:
       - build/output/**
