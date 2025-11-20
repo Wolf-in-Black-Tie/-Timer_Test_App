@@ -159,7 +159,6 @@ F0E1D2C3B4A5968778695A4B /* Project object */ = {
 isa = PBXProject;
 attributes = {
 LastSwiftUpdateCheck = 1500;
-LastUpgradeCheck = 1500;
 ORGANIZATIONNAME = Codex;
 TargetAttributes = {
 C3D4E5F60718293A4B5C6D7E = {
