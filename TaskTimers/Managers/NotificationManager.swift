@@ -2,6 +2,7 @@ import Foundation
 import UserNotifications
 
 /// Handles all notification related logic for the timer experience.
+@MainActor
 final class NotificationManager: NSObject, UNUserNotificationCenterDelegate {
     static let shared = NotificationManager()
     private let center = UNUserNotificationCenter.current()

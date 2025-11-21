@@ -6,6 +6,7 @@ import SwiftUI
 import UIKit
 
 /// Centralized state for all timer related behaviour.
+@MainActor
 final class TimerViewModel: ObservableObject {
     // MARK: - Published properties
     @Published private(set) var tasks: [TaskTimer] = []
