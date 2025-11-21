@@ -19,7 +19,7 @@ private struct RootView: View {
     var body: some View {
         TaskListView()
             .environmentObject(viewModel)
-            .onChange(of: scenePhase) { _, newPhase in
+            .onChange(of: scenePhase) { newPhase in
                 viewModel.handleScenePhaseChange(newPhase)
             }
     }
