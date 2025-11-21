@@ -32,6 +32,8 @@ final class TimerViewModel: ObservableObject {
     private static let backgroundRefreshIdentifier = "com.codex.TaskTimers.refresh"
     private let defaults = UserDefaults.standard
     private let persistedTaskIDKey = "com.codex.TaskTimers.persistedTaskID"
+    private let persistedTaskNameKey = "com.codex.TaskTimers.persistedTaskName"
+    private let persistedTaskDurationKey = "com.codex.TaskTimers.persistedTaskDuration"
     private let persistedEndDateKey = "com.codex.TaskTimers.endDate"
     private let persistedModeKey = "com.codex.TaskTimers.timerMode"
     private let persistedPausedKey = "com.codex.TaskTimers.paused"
@@ -363,6 +365,8 @@ final class TimerViewModel: ObservableObject {
     private func persistCurrentState() {
         guard let task = selectedTask, let endDate else { return }
         defaults.set(task.id.uuidString, forKey: persistedTaskIDKey)
+        defaults.set(task.name, forKey: persistedTaskNameKey)
+        defaults.set(task.duration, forKey: persistedTaskDurationKey)
         defaults.set(endDate.timeIntervalSince1970, forKey: persistedEndDateKey)
         defaults.set(timerMode.rawValue, forKey: persistedModeKey)
         defaults.set(isPaused, forKey: persistedPausedKey)
@@ -371,6 +375,8 @@ final class TimerViewModel: ObservableObject {
 
     private func clearPersistedState() {
         defaults.removeObject(forKey: persistedTaskIDKey)
+        defaults.removeObject(forKey: persistedTaskNameKey)
+        defaults.removeObject(forKey: persistedTaskDurationKey)
         defaults.removeObject(forKey: persistedEndDateKey)
         defaults.removeObject(forKey: persistedPausedKey)
         defaults.removeObject(forKey: persistedDisplayKey)
@@ -384,7 +390,15 @@ final class TimerViewModel: ObservableObject {
         timerMode = TimerMode(rawValue: defaults.string(forKey: persistedModeKey) ?? "countdown") ?? .countdown
         let wasPaused = defaults.bool(forKey: persistedPausedKey)
         let display = defaults.integer(forKey: persistedDisplayKey)
-        guard let task = tasks.first(where: { $0.id == taskID }) else {
+        let persistedName = defaults.string(forKey: persistedTaskNameKey)
+        let persistedDuration = defaults.integer(forKey: persistedTaskDurationKey)
+
+        guard let task = tasks.first(where: { $0.id == taskID }) ?? {
+            if let name = persistedName, persistedDuration > 0 {
+                return TaskTimer(name: name, duration: persistedDuration)
+            }
+            return nil
+        }() else {
             clearPersistedState()
             return
         }
