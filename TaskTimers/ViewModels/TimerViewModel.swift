@@ -36,7 +36,7 @@ final class TimerViewModel: ObservableObject {
     private let persistedTaskNameKey = "com.codex.TaskTimers.persistedTaskName"
     private let persistedTaskDurationKey = "com.codex.TaskTimers.persistedTaskDuration"
     private let persistedEndDateKey = "com.codex.TaskTimers.endDate"
-    private let persistedModeKey = "com.codex.TaskTimers.timerMode"
+    private let persistedModeKey = "timerMode"
     private let persistedPausedKey = "com.codex.TaskTimers.paused"
     private let persistedDisplayKey = "com.codex.TaskTimers.display"
     private let tasksKey = "com.codex.TaskTimers.tasks"
@@ -74,7 +74,7 @@ final class TimerViewModel: ObservableObject {
         isPomodoroActive = true
         isOnBreak = false
         currentCycle = 1
-        let workTask = TaskTimer(name: "Pomodoro • Work", duration: pomodoroSettings.workDuration)
+        let workTask = TaskTimer(name: "Pomodoro • Work", duration: pomodoroSettings.workMinutes * 60)
         configureTimer(with: workTask)
     }
 
@@ -170,16 +170,16 @@ final class TimerViewModel: ObservableObject {
 
     func updateTheme(_ theme: AppTheme) {
         selectedTheme = theme
-        UserDefaults.standard.set(theme.rawValue, forKey: themeKey)
+        defaults.set(theme.rawValue, forKey: themeKey)
     }
 
     func updateSound(_ sound: SoundOption) {
         selectedSound = sound
-        UserDefaults.standard.set(sound.rawValue, forKey: soundKey)
+        defaults.set(sound.rawValue, forKey: soundKey)
     }
 
     func updatePomodoro(work: Int, breakTime: Int, cycles: Int) {
-        pomodoroSettings = PomodoroSettings(workDuration: work, breakDuration: breakTime, cycles: cycles)
+        pomodoroSettings = PomodoroSettings(workMinutes: work, breakMinutes: breakTime, cycles: cycles)
         persistPreferences()
     }
 
@@ -321,12 +321,12 @@ final class TimerViewModel: ObservableObject {
             } else {
                 currentCycle += 1
                 isOnBreak = false
-                let workTask = TaskTimer(name: "Pomodoro • Work", duration: pomodoroSettings.workDuration)
+                let workTask = TaskTimer(name: "Pomodoro • Work", duration: pomodoroSettings.workMinutes * 60)
                 configureTimer(with: workTask)
             }
         } else {
             isOnBreak = true
-            let breakTask = TaskTimer(name: "Pomodoro • Break", duration: pomodoroSettings.breakDuration)
+            let breakTask = TaskTimer(name: "Pomodoro • Break", duration: pomodoroSettings.breakMinutes * 60)
             configureTimer(with: breakTask)
         }
     }
@@ -442,9 +442,9 @@ final class TimerViewModel: ObservableObject {
     }
 
     private func loadPreferences() {
-        if let storedMode = defaults.string(forKey: persistedModeKey),
-           let restoredMode = TimerMode(rawValue: storedMode) {
-            timerMode = restoredMode
+        if let savedMode = defaults.string(forKey: persistedModeKey),
+           let mode = TimerMode(rawValue: savedMode) {
+            timerMode = mode
         }
         if let savedTheme = defaults.string(forKey: themeKey),
            let theme = AppTheme(rawValue: savedTheme) {

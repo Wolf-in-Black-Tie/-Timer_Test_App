@@ -48,22 +48,22 @@ struct SettingsView: View {
 
                 Section("Pomodoro") {
                     Stepper(value: Binding(
-                        get: { viewModel.pomodoroSettings.workDuration / 60 },
-                        set: { viewModel.updatePomodoro(work: $0 * 60, breakTime: viewModel.pomodoroSettings.breakDuration, cycles: viewModel.pomodoroSettings.cycles) }
+                        get: { viewModel.pomodoroSettings.workMinutes },
+                        set: { viewModel.updatePomodoro(work: $0, breakTime: viewModel.pomodoroSettings.breakMinutes, cycles: viewModel.pomodoroSettings.cycles) }
                     ), in: 5...90) {
-                        Text("Work: \(viewModel.pomodoroSettings.workDuration / 60) min")
+                        Text("Work: \(viewModel.pomodoroSettings.workMinutes) min")
                     }
 
                     Stepper(value: Binding(
-                        get: { viewModel.pomodoroSettings.breakDuration / 60 },
-                        set: { viewModel.updatePomodoro(work: viewModel.pomodoroSettings.workDuration, breakTime: $0 * 60, cycles: viewModel.pomodoroSettings.cycles) }
+                        get: { viewModel.pomodoroSettings.breakMinutes },
+                        set: { viewModel.updatePomodoro(work: viewModel.pomodoroSettings.workMinutes, breakTime: $0, cycles: viewModel.pomodoroSettings.cycles) }
                     ), in: 1...30) {
-                        Text("Break: \(viewModel.pomodoroSettings.breakDuration / 60) min")
+                        Text("Break: \(viewModel.pomodoroSettings.breakMinutes) min")
                     }
 
                     Stepper(value: Binding(
                         get: { viewModel.pomodoroSettings.cycles },
-                        set: { viewModel.updatePomodoro(work: viewModel.pomodoroSettings.workDuration, breakTime: viewModel.pomodoroSettings.breakDuration, cycles: $0) }
+                        set: { viewModel.updatePomodoro(work: viewModel.pomodoroSettings.workMinutes, breakTime: viewModel.pomodoroSettings.breakMinutes, cycles: $0) }
                     ), in: 1...8) {
                         Text("Cycles: \(viewModel.pomodoroSettings.cycles)")
                     }
