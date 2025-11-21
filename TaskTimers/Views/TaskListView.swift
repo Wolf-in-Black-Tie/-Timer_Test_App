@@ -38,7 +38,7 @@ struct TaskListView: View {
                         VStack(alignment: .leading) {
                             Text("Pomodoro")
                                 .font(.headline)
-                            Text("Work \(viewModel.pomodoroSettings.workDuration / 60)m · Break \(viewModel.pomodoroSettings.breakDuration / 60)m · \(viewModel.pomodoroSettings.cycles)x")
+                            Text("Work \(viewModel.pomodoroSettings.workMinutes)m · Break \(viewModel.pomodoroSettings.breakMinutes)m · \(viewModel.pomodoroSettings.cycles)x")
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
                         }
