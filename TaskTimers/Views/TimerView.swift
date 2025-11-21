@@ -2,35 +2,29 @@ import SwiftUI
 
 struct TimerView: View {
     @EnvironmentObject private var viewModel: TimerViewModel
+    @State private var useLargeDisplay = true
 
     var body: some View {
-        VStack(spacing: 32) {
-            Spacer()
-            VStack(spacing: 12) {
-                Label(viewModel.selectedTask?.name ?? "Active Timer", systemImage: "hourglass")
-                    .font(.title3.weight(.semibold))
-                    .foregroundStyle(.secondary)
-                Text(viewModel.formattedRemainingTime())
-                    .font(.system(size: 72, weight: .bold, design: .rounded))
-                    .foregroundStyle(.primary)
-                    .monospacedDigit()
-                    .contentTransition(.numericText())
+        ZStack {
+            viewModel.selectedTheme.gradient
+                .ignoresSafeArea()
+
+            VStack(spacing: 24) {
+                header
+                timerCard
+                controlButtons
+                adjustmentRow
             }
             .padding()
-            .frame(maxWidth: .infinity)
-            .background(
-                RoundedRectangle(cornerRadius: 28, style: .continuous)
-                    .fill(Color(.systemBackground))
-                    .shadow(color: Color.black.opacity(0.15), radius: 30, x: 0, y: 10)
-            )
-            .padding(.horizontal)
-
-            controlButtons
-            Spacer()
+            .overlay(alignment: .topTrailing) {
+                dimToggle
+            }
+            .overlay(alignment: .bottomTrailing) {
+                modeBadge
+                    .padding(.trailing, 4)
+            }
+            .opacity(viewModel.isDimmed ? 0.7 : 1)
         }
-        .padding()
-        .background(LinearGradient(colors: [.blue.opacity(0.2), .purple.opacity(0.2)], startPoint: .topLeading, endPoint: .bottomTrailing)
-            .ignoresSafeArea())
         .navigationTitle("Timer")
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
@@ -41,6 +35,70 @@ struct TimerView: View {
                 }
             }
         }
+    }
+
+    private var header: some View {
+        VStack(spacing: 8) {
+            Label(viewModel.selectedTask?.name ?? "Active Timer", systemImage: "hourglass")
+                .font(.title3.weight(.semibold))
+                .foregroundStyle(.white.opacity(0.8))
+            if viewModel.isPomodoroActive {
+                Text(viewModel.isOnBreak ? "Break" : "Work")
+                    .font(.footnote)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 4)
+                    .background(Capsule().fill(Color.white.opacity(0.2)))
+            }
+        }
+    }
+
+    private var timerCard: some View {
+        VStack(spacing: 16) {
+            ZStack {
+                Circle()
+                    .stroke(Color.white.opacity(0.2), lineWidth: 14)
+                Circle()
+                    .trim(from: 0, to: viewModel.progress)
+                    .stroke(viewModel.selectedTheme.accent, style: StrokeStyle(lineWidth: 14, lineCap: .round))
+                    .rotationEffect(.degrees(-90))
+                    .animation(.easeInOut(duration: 0.2), value: viewModel.progress)
+                Text(viewModel.formattedTime())
+                    .font(.system(size: useLargeDisplay ? 80 : 52, weight: .bold, design: .rounded))
+                    .foregroundStyle(.white)
+                    .monospacedDigit()
+                    .contentTransition(.numericText())
+            }
+            .frame(width: useLargeDisplay ? 280 : 220, height: useLargeDisplay ? 280 : 220)
+
+            HStack(spacing: 12) {
+                Button {
+                    useLargeDisplay.toggle()
+                } label: {
+                    Label(useLargeDisplay ? "Standard" : "Large", systemImage: "textformat.size")
+                        .font(.footnote.weight(.semibold))
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 8)
+                        .background(.thinMaterial)
+                        .clipShape(Capsule())
+                }
+
+                if viewModel.isPomodoroActive {
+                    Text("Cycle \(viewModel.currentCycle) of \(viewModel.pomodoroSettings.cycles)")
+                        .font(.footnote)
+                        .foregroundStyle(.white.opacity(0.8))
+                }
+            }
+        }
+        .frame(maxWidth: .infinity)
+        .padding()
+        .background(
+            RoundedRectangle(cornerRadius: 28, style: .continuous)
+                .fill(Color(.systemBackground).opacity(0.15))
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 28, style: .continuous)
+                .stroke(Color.white.opacity(0.08), lineWidth: 1)
+        )
     }
 
     private var controlButtons: some View {
@@ -71,6 +129,52 @@ struct TimerView: View {
             .buttonStyle(.bordered)
             .tint(.red)
         }
+    }
+
+    private var adjustmentRow: some View {
+        HStack(spacing: 12) {
+            Button {
+                viewModel.adjustTime(by: -60)
+            } label: {
+                Label("-1 min", systemImage: "minus.circle")
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.bordered)
+            .tint(.white)
+
+            Button {
+                viewModel.adjustTime(by: 60)
+            } label: {
+                Label("+1 min", systemImage: "plus.circle")
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.borderedProminent)
+            .tint(viewModel.selectedTheme.accent)
+        }
+        .foregroundStyle(.white)
+    }
+
+    private var dimToggle: some View {
+        Button {
+            viewModel.isDimmed.toggle()
+        } label: {
+            Image(systemName: viewModel.isDimmed ? "moon.zzz.fill" : "moon.stars.fill")
+                .font(.title3)
+                .padding(12)
+                .background(.thinMaterial)
+                .clipShape(Circle())
+        }
+        .padding()
+    }
+
+    private var modeBadge: some View {
+        Text(viewModel.timerMode == .countdown ? "Countdown" : "Count Up")
+            .font(.caption2.weight(.semibold))
+            .padding(.horizontal, 12)
+            .padding(.vertical, 6)
+            .background(.ultraThinMaterial)
+            .clipShape(Capsule())
+            .padding()
     }
 }
 
