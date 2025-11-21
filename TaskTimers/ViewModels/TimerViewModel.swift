@@ -23,6 +23,9 @@ final class TimerViewModel: ObservableObject {
     @Published private(set) var isOnBreak: Bool = false
     @Published private(set) var currentCycle: Int = 0
 
+    /// Currently edited task, used by lightweight editor flows.
+    var editingTask: TaskTimer?
+
     // MARK: - Private properties
     private var timer: DispatchSourceTimer?
     private var endDate: Date?
@@ -141,6 +144,20 @@ final class TimerViewModel: ObservableObject {
     }
 
     // MARK: - Task CRUD
+    func saveTask(name: String, minutes: Int) {
+        let duration = minutes * 60
+
+        if var task = editingTask {
+            task.name = name
+            task.duration = duration
+            update(task: task)
+        } else {
+            addTask(name: name, duration: duration)
+        }
+
+        editingTask = nil
+    }
+
     func addTask(name: String, duration: Int) {
         let newTask = TaskTimer(name: name, duration: duration)
         tasks.append(newTask)
