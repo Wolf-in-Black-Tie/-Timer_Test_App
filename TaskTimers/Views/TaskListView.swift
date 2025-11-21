@@ -127,7 +127,7 @@ struct TaskListView: View {
                         .font(.headline)
                         .foregroundStyle(.white)
                         .padding(10)
-                        .background(Circle().fill(viewModel.selectedTheme.accent))
+                        .background(Circle().fill(viewModel.selectedTheme.accentColor))
                 }
                 .buttonStyle(.plain)
             }
