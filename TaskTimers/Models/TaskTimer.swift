@@ -1,9 +1,15 @@
 import Foundation
 
-/// Immutable representation of a task with a preset timer.
-struct TaskTimer: Identifiable, Hashable {
-    let id = UUID()
-    let name: String
+/// Representation of a task with a preset timer.
+struct TaskTimer: Identifiable, Hashable, Codable {
+    let id: UUID
+    var name: String
     /// Duration in seconds.
-    let duration: Int
+    var duration: Int
+
+    init(id: UUID = UUID(), name: String, duration: Int) {
+        self.id = id
+        self.name = name
+        self.duration = duration
+    }
 }

@@ -31,7 +31,7 @@ final class NotificationManager: NSObject, UNUserNotificationCenterDelegate {
         let content = UNMutableNotificationContent()
         content.title = "Time's Up"
         content.body = "\(taskName) has finished."
-        content.sound = UNNotificationSound(named: UNNotificationSoundName("timer_end.mp3"))
+        content.sound = .default
         content.categoryIdentifier = "timer.complete"
 
         let trigger = UNTimeIntervalNotificationTrigger(timeInterval: fireDate.timeIntervalSinceNow, repeats: false)
@@ -53,7 +53,7 @@ final class NotificationManager: NSObject, UNUserNotificationCenterDelegate {
         let content = UNMutableNotificationContent()
         content.title = "Time's Up"
         content.body = "\(taskName) finished."
-        content.sound = UNNotificationSound(named: UNNotificationSoundName("timer_end.mp3"))
+        content.sound = .default
         content.categoryIdentifier = "timer.complete"
 
         let request = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: nil)

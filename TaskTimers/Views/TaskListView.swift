@@ -3,21 +3,97 @@ import SwiftUI
 struct TaskListView: View {
     @EnvironmentObject private var viewModel: TimerViewModel
     @State private var navigateToTimer = false
+    @State private var showingEditor = false
+    @State private var editingTask: TaskTimer?
+    @State private var showingSettings = false
 
     var body: some View {
         NavigationStack {
-            ScrollView {
-                LazyVStack(spacing: 16) {
+            List {
+                Section("Presets") {
                     ForEach(viewModel.tasks) { task in
-                        taskCard(for: task)
+                        taskRow(for: task)
+                            .swipeActions(edge: .trailing) {
+                                Button(role: .destructive) {
+                                    delete(task: task)
+                                } label: {
+                                    Label("Delete", systemImage: "trash")
+                                }
+
+                                Button {
+                                    editingTask = task
+                                    showingEditor = true
+                                } label: {
+                                    Label("Edit", systemImage: "pencil")
+                                }
+                                .tint(.blue)
+                            }
+                    }
+                    .onMove(perform: viewModel.move)
+                    .onDelete(perform: viewModel.delete)
+                }
+
+                Section("Focus") {
+                    HStack {
+                        VStack(alignment: .leading) {
+                            Text("Pomodoro")
+                                .font(.headline)
+                            Text("Work \(viewModel.pomodoroSettings.workDuration / 60)m · Break \(viewModel.pomodoroSettings.breakDuration / 60)m · \(viewModel.pomodoroSettings.cycles)x")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                        Spacer()
+                        Button {
+                            viewModel.startPomodoro()
+                            navigateToTimer = true
+                        } label: {
+                            Label("Start", systemImage: "arrow.triangle.2.circlepath")
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .tint(.orange)
                     }
                 }
-                .padding(.vertical, 24)
+
+                Section("Widget") {
+                    HStack {
+                        VStack(alignment: .leading) {
+                            Text("Last timer")
+                                .font(.headline)
+                            Text(viewModel.lastUsedTaskTitle() ?? "No timer yet")
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
+                        }
+                        Spacer()
+                        Button {
+                            viewModel.startLastTaskIfAvailable()
+                            navigateToTimer = viewModel.isRunning
+                        } label: {
+                            Label("Start", systemImage: "play.circle")
+                        }
+                        .buttonStyle(.bordered)
+                    }
+                }
             }
-            .padding(.horizontal)
-            .background(Color(.systemGroupedBackground))
+            .listStyle(.insetGrouped)
             .navigationTitle("TaskTimers")
-            .toolbar { toolbarContent }
+            .toolbar {
+                toolbarContent
+            }
+            .sheet(isPresented: $showingEditor) {
+                AddEditTimerView(task: $editingTask) { name, minutes in
+                    if var task = editingTask {
+                        task.name = name
+                        task.duration = minutes * 60
+                        viewModel.update(task: task)
+                    } else {
+                        viewModel.addTask(name: name, duration: minutes * 60)
+                    }
+                }
+            }
+            .sheet(isPresented: $showingSettings) {
+                SettingsView()
+                    .environmentObject(viewModel)
+            }
             .background(
                 NavigationLink(isActive: $navigateToTimer) {
                     TimerView()
@@ -28,47 +104,35 @@ struct TaskListView: View {
             )
         }
         .onChange(of: viewModel.isRunning) { running in
-            if running {
-                navigateToTimer = true
-            } else {
-                navigateToTimer = false
-            }
+            navigateToTimer = running
         }
     }
 
-    private func taskCard(for task: TaskTimer) -> some View {
-        VStack(alignment: .leading, spacing: 12) {
+    private func taskRow(for task: TaskTimer) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
                     Text(task.name)
                         .font(.headline)
-                        .foregroundStyle(.primary)
                     Text(durationString(for: task.duration))
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                 }
                 Spacer()
-                Image(systemName: "timer")
-                    .font(.title2)
-                    .foregroundStyle(.blue)
+                Button {
+                    viewModel.start(task: task)
+                    navigateToTimer = true
+                } label: {
+                    Image(systemName: "play.fill")
+                        .font(.headline)
+                        .foregroundStyle(.white)
+                        .padding(10)
+                        .background(Circle().fill(viewModel.selectedTheme.accent))
+                }
+                .buttonStyle(.plain)
             }
-
-            Button {
-                viewModel.start(task: task)
-                navigateToTimer = true
-            } label: {
-                Label("Start", systemImage: "play.fill")
-                    .font(.body.weight(.semibold))
-                    .padding(.vertical, 8)
-                    .frame(maxWidth: .infinity)
-            }
-            .buttonStyle(.borderedProminent)
-            .tint(.blue)
         }
-        .padding()
-        .background(.thinMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
-        .shadow(color: Color.black.opacity(0.08), radius: 12, x: 0, y: 6)
+        .padding(.vertical, 8)
     }
 
     private func durationString(for seconds: Int) -> String {
@@ -78,12 +142,31 @@ struct TaskListView: View {
 
     @ToolbarContentBuilder
     private var toolbarContent: some ToolbarContent {
+        ToolbarItem(placement: .topBarLeading) {
+            EditButton()
+        }
+
         ToolbarItem(placement: .topBarTrailing) {
-            if viewModel.isRunning, let task = viewModel.selectedTask {
-                Label(task.name, systemImage: "bell")
-                    .font(.callout)
-                    .foregroundStyle(.secondary)
+            Button {
+                editingTask = nil
+                showingEditor = true
+            } label: {
+                Label("Add", systemImage: "plus")
             }
+        }
+
+        ToolbarItem(placement: .topBarTrailing) {
+            Button {
+                showingSettings = true
+            } label: {
+                Label("Settings", systemImage: "paintbrush")
+            }
+        }
+    }
+
+    private func delete(task: TaskTimer) {
+        if let index = viewModel.tasks.firstIndex(of: task) {
+            viewModel.delete(at: IndexSet(integer: index))
         }
     }
 }
