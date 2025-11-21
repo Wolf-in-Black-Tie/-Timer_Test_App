@@ -3,7 +3,6 @@ import SwiftUI
 struct TaskListView: View {
     @EnvironmentObject private var viewModel: TimerViewModel
     @State private var navigateToTimer = false
-    @State private var showingEditor = false
     @State private var editingTask: TaskTimer?
     @State private var showingSettings = false
 
@@ -16,16 +15,15 @@ struct TaskListView: View {
                             .swipeActions(edge: .trailing) {
                                 Button(role: .destructive) {
                                     delete(task: task)
-                                } label: {
-                                    Label("Delete", systemImage: "trash")
-                                }
+                            } label: {
+                                Label("Delete", systemImage: "trash")
+                            }
 
-                                Button {
-                                    editingTask = task
-                                    showingEditor = true
-                                } label: {
-                                    Label("Edit", systemImage: "pencil")
-                                }
+                            Button {
+                                presentEditor(for: task)
+                            } label: {
+                                Label("Edit", systemImage: "pencil")
+                            }
                                 .tint(.blue)
                             }
                     }
@@ -79,15 +77,9 @@ struct TaskListView: View {
             .toolbar {
                 toolbarContent
             }
-            .sheet(isPresented: $showingEditor) {
+            .sheet(item: $editingTask) { _ in
                 AddEditTimerView(task: $editingTask) { name, minutes in
-                    if var task = editingTask {
-                        task.name = name
-                        task.duration = minutes * 60
-                        viewModel.update(task: task)
-                    } else {
-                        viewModel.addTask(name: name, duration: minutes * 60)
-                    }
+                    viewModel.saveTask(name: name, minutes: minutes)
                 }
             }
             .sheet(isPresented: $showingSettings) {
@@ -148,8 +140,7 @@ struct TaskListView: View {
 
         ToolbarItem(placement: .topBarTrailing) {
             Button {
-                editingTask = nil
-                showingEditor = true
+                presentEditor(for: nil)
             } label: {
                 Label("Add", systemImage: "plus")
             }
@@ -167,6 +158,15 @@ struct TaskListView: View {
     private func delete(task: TaskTimer) {
         if let index = viewModel.tasks.firstIndex(of: task) {
             viewModel.delete(at: IndexSet(integer: index))
+        }
+    }
+
+    private func presentEditor(for task: TaskTimer?) {
+        viewModel.editingTask = task
+        if let task {
+            editingTask = task
+        } else {
+            editingTask = TaskTimer(name: "", duration: 5 * 60)
         }
     }
 }
