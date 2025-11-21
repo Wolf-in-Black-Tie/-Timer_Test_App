@@ -17,6 +17,8 @@ AA6677889900112233445566 /* Assets.xcassets in Resources */ = {isa = PBXBuildFil
 AA7788990011223344556677 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 99CC00DD11EE22FF33445566 /* Preview Assets.xcassets */; };
 AA8899001122334455667788 /* timer_end.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = AA99BB88CC77DD66EE55FF44 /* timer_end.mp3 */; };
 BBCCDDEEFF00112233445566 /* TimerSupportModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCDDEEFF0011223344556677 /* TimerSupportModels.swift */; };
+AABBCCDD1122334455667788 /* AddEditTimerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDEEFF001122334455667788 /* AddEditTimerView.swift */; };
+AABBDDCC1122334455667788 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEFF00112233445566778899 /* SettingsView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -32,6 +34,8 @@ BBCCDDEEFF00112233445566 /* TimerSupportModels.swift in Sources */ = {isa = PBXB
 99CC00DD11EE22FF33445566 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 AA99BB88CC77DD66EE55FF44 /* timer_end.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = timer_end.mp3; sourceTree = "<group>"; };
 CCDDEEFF0011223344556677 /* TimerSupportModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerSupportModels.swift; sourceTree = "<group>"; };
+DDEEFF001122334455667788 /* AddEditTimerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddEditTimerView.swift; sourceTree = "<group>"; };
+EEFF00112233445566778899 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -96,6 +100,8 @@ isa = PBXGroup;
 children = (
 55EE66FF770088119922AA33 /* TaskListView.swift */,
 66FF770088119922AA33BB44 /* TimerView.swift */,
+            DDEEFF001122334455667788 /* AddEditTimerView.swift */,
+            EEFF00112233445566778899 /* SettingsView.swift */,
 );
 path = Views;
 sourceTree = "<group>";
@@ -208,6 +214,8 @@ buildActionMask = 2147483647;
         files = (
             AA5566778899001122334455 /* TimerView.swift in Sources */,
             AA4455667788990011223344 /* TaskListView.swift in Sources */,
+            AABBCCDD1122334455667788 /* AddEditTimerView.swift in Sources */,
+            AABBDDCC1122334455667788 /* SettingsView.swift in Sources */,
             AA2233445566778899001122 /* TaskTimer.swift in Sources */,
             AA3344556677889900112233 /* TimerViewModel.swift in Sources */,
             BBCCDDEEFF00112233445566 /* TimerSupportModels.swift in Sources */,
