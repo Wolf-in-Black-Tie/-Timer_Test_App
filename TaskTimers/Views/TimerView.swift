@@ -6,7 +6,7 @@ struct TimerView: View {
 
     var body: some View {
         ZStack {
-            viewModel.selectedTheme.gradient
+            backgroundGradient
                 .ignoresSafeArea()
 
             VStack(spacing: 24) {
@@ -59,7 +59,7 @@ struct TimerView: View {
                     .stroke(Color.white.opacity(0.2), lineWidth: 14)
                 Circle()
                     .trim(from: 0, to: viewModel.progress)
-                    .stroke(viewModel.selectedTheme.accent, style: StrokeStyle(lineWidth: 14, lineCap: .round))
+                    .stroke(viewModel.selectedTheme.accentColor, style: StrokeStyle(lineWidth: 14, lineCap: .round))
                     .rotationEffect(.degrees(-90))
                     .animation(.easeInOut(duration: 0.2), value: viewModel.progress)
                 Text(viewModel.formattedTime())
@@ -149,7 +149,7 @@ struct TimerView: View {
                     .frame(maxWidth: .infinity)
             }
             .buttonStyle(.borderedProminent)
-            .tint(viewModel.selectedTheme.accent)
+            .tint(viewModel.selectedTheme.accentColor)
         }
         .foregroundStyle(.white)
     }
@@ -175,6 +175,17 @@ struct TimerView: View {
             .background(.ultraThinMaterial)
             .clipShape(Capsule())
             .padding()
+    }
+
+    private var backgroundGradient: LinearGradient {
+        LinearGradient(
+            colors: [
+                viewModel.selectedTheme.accentColor.opacity(0.7),
+                viewModel.selectedTheme.accentColor.opacity(0.4)
+            ],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
     }
 }
 

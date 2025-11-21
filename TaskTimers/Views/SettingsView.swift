@@ -22,12 +22,12 @@ struct SettingsView: View {
                         get: { viewModel.selectedTheme },
                         set: { viewModel.updateTheme($0) }
                     )) {
-                        ForEach(AppTheme.allCases) { theme in
+                        ForEach(AppTheme.allCases, id: \.self) { theme in
                             HStack {
                                 Circle()
-                                    .fill(theme.accent)
+                                    .fill(theme.accentColor)
                                     .frame(width: 16, height: 16)
-                                Text(theme.name)
+                                Text(theme.rawValue.capitalized)
                             }
                             .tag(theme)
                         }
@@ -39,8 +39,9 @@ struct SettingsView: View {
                         get: { viewModel.selectedSound },
                         set: { viewModel.updateSound($0) }
                     )) {
-                        ForEach(SoundOption.allCases) { sound in
-                            Text(sound.title).tag(sound)
+                        ForEach(SoundOption.allCases, id: \.self) { sound in
+                            Text(sound.rawValue.replacingOccurrences(of: "systemDefault", with: "System Default").capitalized)
+                                .tag(sound)
                         }
                     }
                 }

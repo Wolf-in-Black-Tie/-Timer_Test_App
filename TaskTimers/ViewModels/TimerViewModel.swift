@@ -15,8 +15,8 @@ final class TimerViewModel: ObservableObject {
     @Published var isRunning: Bool = false
     @Published var isPaused: Bool = false
     @Published var timerMode: TimerMode = .countdown
-    @Published var selectedTheme: AppTheme = .ocean
-    @Published var selectedSound: SoundOption = .bell
+    @Published var selectedTheme: AppTheme = .system
+    @Published var selectedSound: SoundOption = .systemDefault
     @Published var isDimmed: Bool = false
     @Published var pomodoroSettings: PomodoroSettings = .default
     @Published private(set) var isPomodoroActive: Bool = false
@@ -40,8 +40,8 @@ final class TimerViewModel: ObservableObject {
     private let persistedPausedKey = "com.codex.TaskTimers.paused"
     private let persistedDisplayKey = "com.codex.TaskTimers.display"
     private let tasksKey = "com.codex.TaskTimers.tasks"
-    private let themeKey = "com.codex.TaskTimers.theme"
-    private let soundKey = "com.codex.TaskTimers.sound"
+    private let themeKey = "selectedTheme"
+    private let soundKey = "selectedSound"
     private let pomodoroKey = "com.codex.TaskTimers.pomodoro"
     private let lastTaskNameKey = "com.codex.TaskTimers.lastTask"
 
@@ -170,12 +170,12 @@ final class TimerViewModel: ObservableObject {
 
     func updateTheme(_ theme: AppTheme) {
         selectedTheme = theme
-        persistPreferences()
+        UserDefaults.standard.set(theme.rawValue, forKey: themeKey)
     }
 
     func updateSound(_ sound: SoundOption) {
         selectedSound = sound
-        persistPreferences()
+        UserDefaults.standard.set(sound.rawValue, forKey: soundKey)
     }
 
     func updatePomodoro(work: Int, breakTime: Int, cycles: Int) {
@@ -446,12 +446,12 @@ final class TimerViewModel: ObservableObject {
            let restoredMode = TimerMode(rawValue: storedMode) {
             timerMode = restoredMode
         }
-        if let storedTheme = defaults.string(forKey: themeKey),
-           let theme = AppTheme(rawValue: storedTheme) {
+        if let savedTheme = defaults.string(forKey: themeKey),
+           let theme = AppTheme(rawValue: savedTheme) {
             selectedTheme = theme
         }
-        if let storedSound = defaults.string(forKey: soundKey),
-           let sound = SoundOption(rawValue: storedSound) {
+        if let savedSound = defaults.string(forKey: soundKey),
+           let sound = SoundOption(rawValue: savedSound) {
             selectedSound = sound
         }
         if let data = defaults.data(forKey: pomodoroKey),
@@ -482,7 +482,23 @@ final class TimerViewModel: ObservableObject {
 
     // MARK: - Sound & Haptics
     private func playCompletionSound() {
-        AudioServicesPlaySystemSound(selectedSound.systemSoundID)
+        guard selectedSound != .silent else { return }
+
+        let soundID: SystemSoundID
+        switch selectedSound {
+        case .systemDefault:
+            soundID = 1005
+        case .chime:
+            soundID = 1013
+        case .bell:
+            soundID = 1020
+        case .tick:
+            soundID = 1113
+        case .silent:
+            return
+        }
+
+        AudioServicesPlaySystemSound(soundID)
     }
 
     private func triggerHaptics() {
